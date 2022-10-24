@@ -1,5 +1,7 @@
 import hashlib
 import socket
+import multiprocessing
+
 
 IP = '127.0.0.1'
 PORT = 8080
@@ -8,7 +10,24 @@ MD5_STR = "81dc9bdb52d04dc20036dbd8313ed055"
 my_socket.connect((IP, PORT))"""
 
 
-def calculate_range(start, end, md5_str):
+
+def divide_md5(md5_str):
+    start = 0
+    md5_len = len(md5_str)
+    cpu_count = multiprocessing.cpu_count()
+    end = 10000 / cpu_count
+    found = False
+    while not found:
+        new_pass = calculate_password(start, end, md5_str)
+        if new_pass != "NOT FOUND":
+            found = True
+        else:
+            start = end + 1
+            end += md5_len / cpu_count
+    return new_pass
+
+
+def calculate_password(start, end, md5_str):
     while start != end:
         if hashlib.md5(str(start).encode()).hexdigest() == md5_str:
             return str(start)
@@ -17,7 +36,7 @@ def calculate_range(start, end, md5_str):
 
 
 def main():
-    print(calculate_range(0, 2000, MD5_STR))
+    print(divide_md5(MD5_STR))
 
 
 if __name__ == "__main__":
