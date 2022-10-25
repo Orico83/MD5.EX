@@ -1,6 +1,5 @@
 import hashlib
 import socket
-import multiprocessing
 from os import cpu_count
 
 SERVER_IP = '127.0.0.1'
