@@ -34,11 +34,16 @@ def calculate_password(start, end, md5_str):
 def main():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((SERVER_IP, PORT))
+    print("Connected to server")
     client_socket.send(str(cpu_count()).encode())
+    print("Sent CPU count")
     MD5_STR = client_socket.recv(MAX_PACKET).decode()
+    client_socket.send()
+    print("received hash: " + MD5_STR)
     start = int(client_socket.recv(MAX_PACKET).decode())
+    print("start: " + str(start))
     end = int(client_socket.recv(MAX_PACKET).decode())
-    print(MD5_STR)
+    print("end: " + str(end))
     client_socket.send(divide_md5(MD5_STR, start).encode())
     print(divide_md5(MD5_STR, start))
 

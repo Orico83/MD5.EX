@@ -24,6 +24,7 @@ def handle_connection(client_socket, client_address, start):
 def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     start = 0
+    threads = []
     try:
         server_socket.bind((IP, PORT))
         server_socket.listen(QUEUE_LEN)
@@ -31,8 +32,9 @@ def main():
         while True:
             client_socket, client_address = server_socket.accept()
             thread = Thread(target=handle_connection, args=(client_socket, client_address, start))
+            threads.append(thread)
             thread.start()
-            start = end
+            #start = end
     except socket.error as err:
         print("received socket exception -" + str(err))
     finally:
