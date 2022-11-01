@@ -38,7 +38,6 @@ def main():
     client_socket.send(str(cpu_count()).encode())
     print("Sent CPU count")
     MD5_STR = client_socket.recv(MAX_PACKET).decode()
-    client_socket.send()
     print("received hash: " + MD5_STR)
     start = int(client_socket.recv(MAX_PACKET).decode())
     print("start: " + str(start))
