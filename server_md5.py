@@ -10,6 +10,7 @@ PORT = 8080
 QUEUE_LEN = 10
 CHUNK_SIZE = 10000
 NUM_THREADS = 4
+answers_list = []
 
 
 def handle_connection(client_socket, client_address, start):
@@ -21,13 +22,14 @@ def handle_connection(client_socket, client_address, start):
     client_socket.send(str(end).encode())
     answer = client_socket.recv(MAX_PACKET).decode()
     print(answer)
-    return answer
+    answers_list.append(answer + str(end))
 
 
 def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     start = 0
     threads = []
+    answer = -1
     try:
         server_socket.bind((IP, PORT))
         server_socket.listen(QUEUE_LEN)
@@ -38,9 +40,11 @@ def main():
                 thread = ThreadReturn(target=handle_connection, args=(client_socket, client_address, start))
                 thread.start()
                 threads.append(thread)
+                answer += 1
             for thread in threads:
-                print(thread.join())
-                start = end
+                thread.join()
+                start = int(answers_list[answer][9:])
+                print(start)
     except socket.error as err:
         print("received socket exception -" + str(err))
     finally:
