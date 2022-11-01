@@ -10,8 +10,7 @@ ORIGINAL_LEN = 7
 NOT_FOUND = "NOT FOUND"
 
 
-def divide_md5(md5_str, start):
-    end = start + CHUNK_SIZE / int(cpu_count())
+"""def divide_md5(md5_str, start, end):
     found = False
     while not found:
         check_pass = calculate_password(start, end, md5_str)
@@ -20,10 +19,10 @@ def divide_md5(md5_str, start):
         else:
             start = end
             end += CHUNK_SIZE / cpu_count()
-    return check_pass
+    return check_pass"""
 
 
-def calculate_password(start, end, md5_str):
+def calculate_password(md5_str, start, end):
     while start != end:
         if hashlib.md5(str(start).zfill(ORIGINAL_LEN).encode()).hexdigest() == md5_str:
             return str(start)
@@ -43,8 +42,8 @@ def main():
     print("start: " + str(start))
     end = int(client_socket.recv(MAX_PACKET).decode())
     print("end: " + str(end))
-    client_socket.send(divide_md5(MD5_STR, start).encode())
-    print(divide_md5(MD5_STR, start))
+    client_socket.send(calculate_password(MD5_STR, start, end).encode())
+    print(calculate_password(MD5_STR, start, end))
 
 
 if __name__ == "__main__":

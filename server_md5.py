@@ -19,9 +19,9 @@ def handle_connection(client_socket, client_address, start):
     client_socket.send(MD5_STR.encode())
     client_socket.send(str(start).encode())
     client_socket.send(str(end).encode())
-    request = client_socket.recv(MAX_PACKET).decode()
-    print(request)
-    return end
+    answer = client_socket.recv(MAX_PACKET).decode()
+    print(answer)
+    return answer
 
 
 def main():
@@ -39,8 +39,7 @@ def main():
                 thread.start()
                 threads.append(thread)
             for thread in threads:
-                end = thread.join()
-                print(end)
+                print(thread.join())
                 start = end
     except socket.error as err:
         print("received socket exception -" + str(err))

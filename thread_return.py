@@ -19,6 +19,5 @@ class ThreadReturn(Thread):
                                         **self._kwargs)
 
     def join(self, *args):
-        Thread.join(sel
-        f, *args)
+        Thread.join(self, *args)
         return self._return
