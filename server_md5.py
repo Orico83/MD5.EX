@@ -1,8 +1,7 @@
 import socket
 from threading import Thread
 
-MD5_STR = "fcea920f7412b5da7be0cf42b8c93759"
-MAX_NUM = 9999999999
+MD5_STR = "25d55ad283aa400af464c76d713c07ad"
 IP = '0.0.0.0'
 MAX_PACKET = 1024
 PORT = 8820
@@ -33,20 +32,21 @@ def handle_connection(client_socket):
     try:
         cpu_count = int(client_socket.recv(MAX_PACKET).decode())
         print("Client CPU count: " + str(cpu_count))
-        while not found:
-            client_socket.send(create_msg().encode())
-            print(f"Sent to thread number{num}")
-            num += 1
-            answer = client_socket.recv(MAX_PACKET).decode()
-            if answer != "NOT FOUND":
-                print("answer: " + answer)
-                found = True
-            else:
-                client_socket.send("NOT FOUND".encode())
+        client_socket.send(create_msg().encode())
+        num += 1
+        print(f"Sent to client number{num}")
+        answer = client_socket.recv(MAX_PACKET).decode()
+        if answer != "NOT FOUND":
+            print("answer: " + answer)
+            found = True
+            client_socket.send("DISCONNECT".encode())
+        else:
+            client_socket.send("NOT FOUND!".encode())
     except socket.error as err:
         print(str(err))
     finally:
-        client_socket.close()
+        """client_socket.close()
+        print("Disconnected from client")"""
 
 
 def main():
@@ -55,22 +55,19 @@ def main():
     server_socket.listen(QUEUE_LEN)
     print("Listening for connections on port %d" % PORT)
     global found
-    while True:
-        try:
-            while not found:
-                client_socket, client_address = server_socket.accept()
-                print(f"connected to client {client_address}")
-                thread = Thread(target=handle_connection, args=(client_socket,))
-                thread.start()
-                threads.append(thread)
-            if found:
-                for thread in threads:
-                    thread.join()
-            break
-        except socket.error as err:
-            print("received socket exception -" + str(err))
-        finally:
-            server_socket.close()
+    try:
+        while not found:
+            client_socket, client_address = server_socket.accept()
+            print(f"connected to client {client_address}")
+            thread = Thread(target=handle_connection, args=(client_socket,))
+            thread.start()
+            threads.append(thread)
+            for thread in threads:
+                thread.join()
+    except socket.error as err:
+        print("received socket exception -" + str(err))
+    finally:
+        server_socket.close()
 
 
 if __name__ == "__main__":
