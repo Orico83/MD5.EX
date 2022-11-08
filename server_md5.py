@@ -5,7 +5,7 @@ MD5_STR = "fcea920f7412b5da7be0cf42b8c93759"
 MAX_NUM = 9999999999
 IP = '0.0.0.0'
 MAX_PACKET = 1024
-PORT = 8080
+PORT = 8820
 QUEUE_LEN = 10
 CHUNK_SIZE = 100000
 NUM_THREADS = 4
@@ -29,17 +29,20 @@ def create_msg():
 
 def handle_connection(client_socket):
     global found, end, cpu_count, answer
+    num = 0
     try:
-        while True:
-            while not found:
-                cpu_count = int(client_socket.recv(MAX_PACKET).decode())
-                print("Client CPU count: " + str(cpu_count))
-                client_socket.send(create_msg().encode())
-                answer = client_socket.recv(MAX_PACKET).decode()
-                print(answer)
-                if answer != "NOT FOUND":
-                    found = True
-            break
+        cpu_count = int(client_socket.recv(MAX_PACKET).decode())
+        print("Client CPU count: " + str(cpu_count))
+        while not found:
+            client_socket.send(create_msg().encode())
+            print(f"Sent to thread number{num}")
+            num += 1
+            answer = client_socket.recv(MAX_PACKET).decode()
+            if answer != "NOT FOUND":
+                print("answer: " + answer)
+                found = True
+            else:
+                client_socket.send("NOT FOUND".encode())
     except socket.error as err:
         print(str(err))
     finally:
